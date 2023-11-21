@@ -12,6 +12,12 @@ doener_liste = [
 # Beispiel-Liste von Admins (zum Testen)
 admins = ['admin1', 'admin2']
 
+doener_liste = [
+    {'name': 'Döner Klassik', 'preis': 5.0, 'saucen': ['Kräuter'], 'salate': ['Tomate']},
+    {'name': 'Döner mit Extra Fleisch', 'preis': 7.0, 'saucen': ['Kräuter', 'Knoblauch'], 'salate': ['Tomate', 'Gurke']},
+    {'name': 'Vegetarischer Döner', 'preis': 4.5, 'saucen': ['Kräuter', 'Scharf'], 'salate': ['Tomate', 'Gurke', 'Kopfsalat']},
+]
+
 # Authentifizierungsfunktion
 def is_admin(username):
     return username in admins
@@ -44,6 +50,24 @@ def add_doener():
 def index():
     # Rendere die index.html-Seite
     return render_template('index.html')
+@app.route('/bestellungen', methods=['GET'])
+def bestellungen_ansicht():
+    return render_template('bestellungen.html', bestellungen=bestellungen)
+# Liste zur Speicherung von Bestellungen
+bestellungen = []
+
+@app.route('/bestellen', methods=['POST'])
+def bestellen():
+    bestellDaten = {
+        'doener': request.json.get('doener'),
+        'saucen': request.json.get('saucen'),
+        'salate': request.json.get('salate')
+    }
+
+    # Bestellung zur Liste hinzufügen
+    bestellungen.append(bestellDaten)
+
+    return jsonify({'message': 'Bestellung erfolgreich aufgegeben'}), 201
 
 if __name__ == '__main__':
     app.run(debug=False, host='0.0.0.0')

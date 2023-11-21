@@ -1,0 +1,36 @@
+<!-- bestellungen.html -->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bestellungsansicht</title>
+</head>
+<body>
+    <h1>Bestellungsansicht</h1>
+
+    <ul id="bestellungenListe"></ul>
+
+    <script>
+        // JavaScript-Code, um Bestellungen anzuzeigen
+        fetch('/bestellungen')
+        .then(response => response.json())
+        .then(data => {
+            // Bestellungen im JSON-Format erhalten
+            var bestellungen = data.bestellungen;
+
+            // Elemente zur Liste hinzufügen
+            var bestellungenListe = document.getElementById('bestellungenListe');
+            bestellungen.forEach(function(bestellung) {
+                var listItem = document.createElement('li');
+                listItem.textContent = 'Döner: ' + bestellung.doener + ', Saucen: ' + bestellung.saucen.join(', ') + ', Salate: ' + bestellung.salate.join(', ');
+                bestellungenListe.appendChild(listItem);
+            });
+        })
+        .catch((error) => {
+            console.error('Fehler beim Abrufen der Bestellungen:', error);
+        });
+    </script>
+</body>
+</html>

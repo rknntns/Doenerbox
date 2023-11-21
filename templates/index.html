@@ -6,89 +6,85 @@
     <title>Döner Bestellung</title>
 </head>
 <body>
+    <h1>Döner Bestellung</h1>
 
-<h1>Döner Bestellung</h1>
+    <form id="bestellForm">
+        <label for="doener">Döner:</label>
+        <select id="doener" name="doener">
+            <!-- Hier könntest du dynamisch die verfügbaren Döner-Optionen hinzufügen -->
+            <option value="DoenerKlassik">Döner Klassik</option>
+            <option value="ExtraFleisch">Döner mit Extra Fleisch</option>
+            <option value="Vegetarisch">Vegetarischer Döner</option>
+        </select>
 
-<form id="orderForm">
-    <label for="doener">Döner:</label>
-    <select id="doener" name="doener"></select>
+        <label for="saucen">Saucen:</label>
+        <select id="saucen" name="saucen" multiple>
+            <option value="Kraeuter">Kräuter</option>
+            <option value="Knoblauch">Knoblauch</option>
+            <option value="Scharf">Scharf</option>
+            <!-- Weitere Saucen hier -->
+        </select>
 
-    <h3>Zutaten:</h3>
+        <label for="salate">Salate:</label>
+        <select id="salate" name="salate" multiple>
+            <option value="Tomate">Tomate</option>
+            <option value="Gurke">Gurke</option>
+            <option value="Kopfsalat">Kopfsalat</option>
+            <!-- Weitere Salate hier -->
+        </select>
 
-    <label for="salate">Salate:</label>
-    <select id="salate" name="salate" multiple>
-        <option value="Tomate">Tomate</option>
-        <option value="Zwiebeln">Zwiebeln</option>
-        <option value="Gurke">Gurke</option>
-        <option value="Kopfsalat">Kopfsalat</option>
-        <option value="Gemüse">Gemüse</option>
-    </select>
+        <!-- Hier könnten andere Bestellinformationen hinzugefügt werden -->
 
-    <label for="saucen">Saucen:</label>
-    <select id="saucen" name="saucen" multiple>
-        <option value="Kräuter">Kräuter</option>
-        <option value="Knoblauch">Knoblauch</option>
-        <option value="Scharf">Scharf</option>
-    </select>
+        <button type="button" onclick="bestellungAufgeben()">Bestellen</button>
+    </form>
 
-    <label for="vegan">Vegan:</label>
-    <input type="checkbox" id="vegan" name="vegan">
-
-    <label for="mitKaese">Mit Käse:</label>
-    <input type="checkbox" id="mitKaese" name="mitKaese">
-
-    <br>
-
-    <button type="button" onclick="submitOrder()">Bestellen</button>
-</form>
-
+    <!-- index.html -->
+    <!-- Link zu den Bestellungen -->
+    <a href="/bestellungen">Bestellungen ansehen</a>
 <script>
-document.addEventListener('DOMContentLoaded', function () {
-    // Lade Döner-Optionen vom Server
-    fetch('http://127.0.0.1:5000/doener')
+    function bestellungAufgeben() {
+        var selectedDoener = document.getElementById("doener").value;
+        var selectedSaucen = getSelectedOptions("saucen");
+        var selectedSalate = getSelectedOptions("salate");
+
+        // Daten im JSON-Format für die Bestellung
+        var bestellDaten = {
+            "doener": selectedDoener,
+            "saucen": selectedSaucen,
+            "salate": selectedSalate
+        };
+
+        // Daten an den Server senden
+        fetch('/bestellen', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(bestellDaten),
+        })
         .then(response => response.json())
         .then(data => {
-            const doenerSelect = document.getElementById('doener');
-            data.forEach(doener => {
-                const option = document.createElement('option');
-                option.value = doener.name;
-                option.text = doener.name + ' - ' + doener.preis + ' €';
-                doenerSelect.appendChild(option);
-            });
+            // Server-Antwort verarbeiten (optional)
+            console.log('Server-Antwort:', data);
+
+            // Hier könntest du weitere Aktionen nach dem Bestellen ausführen
+            alert('Bestellung erfolgreich aufgegeben!');
+        })
+        .catch((error) => {
+            console.error('Fehler beim Senden der Bestellung:', error);
         });
-});
+    }
 
-function submitOrder() {
-    const doener = document.getElementById('doener').value;
-    const salate = Array.from(document.getElementById('salate').selectedOptions, option => option.value);
-    const saucen = Array.from(document.getElementById('saucen').selectedOptions, option => option.value);
-    const vegan = document.getElementById('vegan').checked;
-    const mitKaese = document.getElementById('mitKaese').checked;
-
-    // Hier kannst du die Bestellung an den Server senden (z.B. mit Fetch-API)
-    // Beachte, dass dies nur ein Beispiel ist und angepasst werden muss, um mit deiner Server-API zu interagieren.
-    fetch('http://127.0.0.1:5000/bestellung', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-            doener: doener,
-            salate: salate,
-            saucen: saucen,
-            vegan: vegan,
-            mitKaese: mitKaese,
-        }),
-    })
-    .then(response => response.json())
-    .then(data => {
-        alert('Bestellung erfolgreich! ' + JSON.stringify(data));
-    })
-    .catch(error => {
-        console.error('Fehler beim Senden der Bestellung:', error);
-    });
-}
+    function getSelectedOptions(selectId) {
+        var select = document.getElementById(selectId);
+        var selectedOptions = [];
+        for (var i = 0; i < select.options.length; i++) {
+            if (select.options[i].selected) {
+                selectedOptions.push(select.options[i].value);
+            }
+        }
+        return selectedOptions;
+    }
 </script>
-
 </body>
 </html>
