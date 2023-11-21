@@ -1,4 +1,4 @@
-from flask import Flask, jsonify, request, abort
+from flask import Flask, render_template, jsonify, request, abort
 
 app = Flask(__name__)
 
@@ -30,7 +30,7 @@ def get_doener_by_index(index):
 @app.route('/doener', methods=['POST'])
 def add_doener():
     # Überprüfe, ob der Benutzer ein Admin ist
-    username = request.authorization.username
+    username = request.authorization.get('username')
     if not is_admin(username):
         abort(401, description="Nicht autorisiert, um Döner hinzuzufügen.")
 
@@ -39,6 +39,11 @@ def add_doener():
     doener_liste.append(new_doener)
 
     return jsonify({'message': 'Döner erfolgreich hinzugefügt'}), 201
+
+@app.route('/')
+def index():
+    # Rendere die index.html-Seite
+    return render_template('index.html')
 
 if __name__ == '__main__':
     app.run(debug=True)
